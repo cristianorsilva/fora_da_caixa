@@ -1,0 +1,1 @@
+const mainDirectory = 'C:/Screenshots/';
