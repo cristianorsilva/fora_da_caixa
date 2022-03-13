@@ -6,7 +6,7 @@ A new Flutter project.
 
 
 
-# fora_aa_caixa
+# fora_da_caixa
 
 Primeiro projeto em flutter, para uso de treinamentos de automação E2E.
 
