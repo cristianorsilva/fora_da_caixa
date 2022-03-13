@@ -1,10 +1,3 @@
-# fora_da_caixa
-
-A new Flutter project.
-
-
-
-
 
 # fora_da_caixa
 
