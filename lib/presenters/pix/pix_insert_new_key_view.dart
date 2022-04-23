@@ -153,6 +153,7 @@ class _PixInsertNewKeyViewState extends State<PixInsertNewKeyView> {
           child: const Icon(Icons.navigate_next_rounded),
           onPressed: () async {
             bool isValid = false;
+            Database db = await DatabaseHelper().initDb();
             UserPixKey? userPixKey = null;
 
             switch (widget.enumPixKeyType) {
@@ -176,9 +177,14 @@ class _PixInsertNewKeyViewState extends State<PixInsertNewKeyView> {
               switch (widget.enumPixKeyType) {
                 case EnumPixKeyType.telefone:
                   userPixKey.keyPix = _textPixKeyTelefoneController.text;
-                  userPixKey.idTypePixKey = EnumPixKeyType.telefone.index;
+                  List<PixKeyType> listTypePixKey = await PixKeyType().getAllPixKeysType(db);
+                  userPixKey.idTypePixKey =
+                      listTypePixKey.where((typePixKey) => typePixKey.pixKeyType == describeEnum(EnumPixKeyType.telefone)).first.id;
+                  userPixKey.idUser = widget.user.id;
+
                   break;
                 case EnumPixKeyType.email:
+                  //TODO: it is not OK, should be similar to telefone block code
                   userPixKey.keyPix = _textPixKeyEmailController.text;
                   userPixKey.idTypePixKey = EnumPixKeyType.email.index;
                   break;
@@ -362,8 +368,8 @@ class _PixInsertNewKeyViewState extends State<PixInsertNewKeyView> {
       case EnumPixKeyType.telefone:
         pixKeyValue = _textPixKeyTelefoneController.text;
         if (pixKeyValue.isEmpty || pixKeyValue.length < 15) {
-          await showAlertDialog('Automação Fora da Caixa', 'Formato de celular é inválido!', context, 'alertDialogTitle', 'alertDialogMessage',
-              'alertDialogButtonOk');
+          await showAlertDialog(
+              'Automação Fora da Caixa', 'Formato de celular é inválido!', context, 'alertDialogTitle', 'alertDialogMessage', 'alertDialogButtonOk');
           isValid = false;
         }
 
@@ -372,8 +378,8 @@ class _PixInsertNewKeyViewState extends State<PixInsertNewKeyView> {
         pixKeyValue = _textPixKeyEmailController.text;
 
         if (pixKeyValue.isEmpty || pixKeyValue.length < 13) {
-          await showAlertDialog('Automação Fora da Caixa', 'Formato de email é inválido!', context,'alertDialogTitle', 'alertDialogMessage',
-              'alertDialogButtonOk');
+          await showAlertDialog(
+              'Automação Fora da Caixa', 'Formato de email é inválido!', context, 'alertDialogTitle', 'alertDialogMessage', 'alertDialogButtonOk');
           isValid = false;
         }
 
