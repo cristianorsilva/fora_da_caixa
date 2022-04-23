@@ -66,50 +66,50 @@ class _PixTransferRecipientViewState extends State<PixTransferRecipientView> {
         key: const Key('buttonArrowContinue'),
       ),
       body: Container(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Para quem você deseja transferir?',
-              style: Theme.of(context).textTheme.headline1,
-            ),
-            const Padding(padding: EdgeInsets.only(bottom: 25)),
-            Text(
-              'O valor a ser transferido é de:',
-              style: Theme.of(context).textTheme.bodyText2,
-              key: const Key('textValueTransfer'),
-            ),
-            const Padding(padding: EdgeInsets.only(bottom: 10)),
-            Text(
-              putCurrencyMask(widget.userTransaction.value),
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            const Padding(padding: EdgeInsets.only(bottom: 25)),
-            Text(
-              'Selecione o tipo de chave do destinatário:',
-              style: Theme.of(context).textTheme.bodyText2,
-            ),
-            const Padding(padding: EdgeInsets.only(bottom: 10)),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  createChoiceChip('CPF/CNPJ', EnumPixKeyType.cpf_cnpj, 'choiceChipPixKeyCPFCNPJ'),
-                  const Padding(padding: EdgeInsets.only(left: 5)),
-                  createChoiceChip('Chave Aleatória', EnumPixKeyType.chave_aleatoria, 'choiceChipPixKeyAleatory'),
-                  const Padding(padding: EdgeInsets.only(left: 5)),
-                  createChoiceChip('Telefone', EnumPixKeyType.telefone, 'choiceChipPixKeyCellphone'),
-                  const Padding(padding: EdgeInsets.only(left: 5)),
-                  createChoiceChip('Email', EnumPixKeyType.email, 'choiceChipPixKeyEmail'),
-                ],
+          padding: const EdgeInsets.all(10),
+          child: SingleChildScrollView(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Para quem você deseja transferir?',
+                style: Theme.of(context).textTheme.headline1,
               ),
-            ),
-            const Padding(padding: EdgeInsets.only(bottom: 10)),
-            _textFieldRecipientKey()
-          ],
-        ),
-      ),
+              const Padding(padding: EdgeInsets.only(bottom: 25)),
+              Text(
+                'O valor a ser transferido é de:',
+                style: Theme.of(context).textTheme.bodyText2,
+                key: const Key('textValueTransfer'),
+              ),
+              const Padding(padding: EdgeInsets.only(bottom: 10)),
+              Text(
+                putCurrencyMask(widget.userTransaction.value),
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
+              const Padding(padding: EdgeInsets.only(bottom: 25)),
+              Text(
+                'Selecione o tipo de chave do destinatário:',
+                style: Theme.of(context).textTheme.bodyText2,
+              ),
+              const Padding(padding: EdgeInsets.only(bottom: 10)),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    createChoiceChip('CPF/CNPJ', EnumPixKeyType.cpf_cnpj, 'choiceChipPixKeyCPFCNPJ'),
+                    const Padding(padding: EdgeInsets.only(left: 5)),
+                    createChoiceChip('Chave Aleatória', EnumPixKeyType.chave_aleatoria, 'choiceChipPixKeyAleatory'),
+                    const Padding(padding: EdgeInsets.only(left: 5)),
+                    createChoiceChip('Telefone', EnumPixKeyType.telefone, 'choiceChipPixKeyCellphone'),
+                    const Padding(padding: EdgeInsets.only(left: 5)),
+                    createChoiceChip('Email', EnumPixKeyType.email, 'choiceChipPixKeyEmail'),
+                  ],
+                ),
+              ),
+              const Padding(padding: EdgeInsets.only(bottom: 10)),
+              _textFieldRecipientKey()
+            ],
+          ))),
     );
   }
 
@@ -149,16 +149,25 @@ class _PixTransferRecipientViewState extends State<PixTransferRecipientView> {
         isValid = _validateCPFCNPJ(pixKeyValue);
         userPixKey = await _verifyKey(pixKeyValue);
         if (!isValid) {
-          await showAlertDialog(
-              'Automação Fora da Caixa', 'A chave CPF/CNPJ informada é inválida!', context, 'alertDialogTitle', 'alertDialogMessage', 'alertDialogButtonOk');
+          await showAlertDialog('Automação Fora da Caixa', 'A chave CPF/CNPJ informada é inválida!', context, 'alertDialogTitle',
+              'alertDialogMessage', 'alertDialogButtonOk');
         } else if (userPixKey == null) {
-          await showAlertDialog(
-              'Automação Fora da Caixa', 'A chave CPF/CNPJ informada não existe!', context, 'alertDialogTitle', 'alertDialogMessage', 'alertDialogButtonOk');
+          await showAlertDialog('Automação Fora da Caixa', 'A chave CPF/CNPJ informada não existe!', context, 'alertDialogTitle',
+              'alertDialogMessage', 'alertDialogButtonOk');
         }
         break;
       case EnumPixKeyType.chave_aleatoria:
         break;
       case EnumPixKeyType.telefone:
+        isValid = _validateCellphone(pixKeyValue);
+        userPixKey = await _verifyKey(pixKeyValue);
+        if (!isValid) {
+          await showAlertDialog('Automação Fora da Caixa', 'A chave de telefone informada é inválida!', context, 'alertDialogTitle',
+              'alertDialogMessage', 'alertDialogButtonOk');
+        } else if (userPixKey == null) {
+          await showAlertDialog('Automação Fora da Caixa', 'A chave de telefone informada não existe!', context, 'alertDialogTitle',
+              'alertDialogMessage', 'alertDialogButtonOk');
+        }
         break;
       case EnumPixKeyType.email:
         break;
@@ -176,6 +185,14 @@ class _PixTransferRecipientViewState extends State<PixTransferRecipientView> {
     }
   }
 
+  bool _validateCellphone(String pixKeyValue) {
+    if (pixKeyValue.isEmpty || pixKeyValue.length < 15) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   Future<UserPixKey?> _verifyKey(String pixKeyValue) async {
     Database db = await DatabaseHelper().db;
     UserPixKey? userPixKey = await UserPixKey().getUserPixKeyByKey(pixKeyValue, db);
@@ -187,9 +204,7 @@ class _PixTransferRecipientViewState extends State<PixTransferRecipientView> {
       key: Key(key),
       label: Text(
         label,
-        style: TextStyle(
-          color: _enumPixKeyType == enumPixKeyType ? Colors.white : Colors.black, fontWeight: FontWeight.normal
-        ),
+        style: TextStyle(color: _enumPixKeyType == enumPixKeyType ? Colors.white : Colors.black, fontWeight: FontWeight.normal),
       ),
       selectedColor: _enumPixKeyType == enumPixKeyType ? Theme.of(context).primaryColor : Theme.of(context).disabledColor,
       selected: _enumPixKeyType == enumPixKeyType,
